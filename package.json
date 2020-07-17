@@ -1,0 +1,26 @@
+{
+  "name": "cyf-db-lesson-2",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "config": "^3.3.1",
+    "mongodb": "^3.5.9",
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "mocha": "^8.0.1",
+    "sinon": "^9.0.2",
+    "chai": "^4.2.0",
+    "chai-http": "^4.3.0"
+  },
+  "scripts": {
+    "test": "mocha --exit --timeout 10000 test",
+    "start": "node server.js"
+  },
+  "author": "",
+  "license": "ISC"
+}
