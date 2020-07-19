@@ -34,7 +34,7 @@ app.post("/films", function (request, response) {
   const film = {
     title: request.query.title,
     year: Number(request.query.year),
-    actors: request.query.actors.split(",")
+    actors: request.query.actors.split(",").filter((actor) => actor.length>0)
   };
 
   client.connect(function () {

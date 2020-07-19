@@ -125,10 +125,11 @@ describe('Films', () => {
 
     it('POST should accept empty actor list', (done) => {
       chai.request(server)
-        .post('/films?title=TEST Ex Machina&year=2014&actors=%02%03')
+        .post('/films?title=TEST Ex Machina&year=2014&actors=')
         .end((err, res) => {
 	  try {
             res.should.have.status(200)
+	    res.body.actors.should.be.empty
             done();
 	  } catch (e) {
 	    done(e)
