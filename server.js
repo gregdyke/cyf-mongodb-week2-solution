@@ -19,27 +19,12 @@ app.get("/", function (request, response) {
 
 app.post("/films", function (request, response) {
   const client = new mongodb.MongoClient(uri, mongoOptions);
-  
-  const missingParams = ["title", "year", "actors"].filter(key => !(key in request.query));
-  if (missingParams.length>0) {
-    response.status(400).send("Uri params missing:" + missingParams.join(", "));
-    return;
-  }
-
-  if (isNaN(request.query.year)) {
-    response.status(400).send("Year must be a number");
-    return;
-  }
-				    
-  const film = {
-    title: request.query.title,
-    year: Number(request.query.year),
-    actors: request.query.actors.split(",").filter((actor) => actor.length>0)
-  };
 
   client.connect(function () {
     const db = client.db("cinema");
     const collection = db.collection("films");
+    
+    const film = {}
 
     collection.insertOne(film, function (error, result) {
       response.send(error || result.ops[0]);
@@ -51,40 +36,12 @@ app.post("/films", function (request, response) {
 app.put("/films/:id", function (request, response) {
   const client = new mongodb.MongoClient(uri, mongoOptions);
 
-  if (!mongodb.ObjectId.isValid(request.params.id)) {
-    response.sendStatus(400);
-    return
-  }
-
-  if (!getPutBodyIsAllowed(request.params, request.body)) {
-    response.sendStatus(422);
-    return
-  }
-
   client.connect(function () {
     const db = client.db("cinema");
     const collection = db.collection("films");
 
-    const searchObject = { _id: mongodb.ObjectId(request.params.id) };
-
-    const updateObject = {
-      $set: { // or we should convert the _id in request.body to ObjectId, but trying to change it would be an error anyway
-	title: request.body.title,
-	year: request.body.year,
-	actors: request.body.actors
-      }
-    };
-
-    const options = { returnOriginal: false };
-
-    collection.findOneAndUpdate(searchObject, updateObject, options, function (error, result) {
-      if (result.value) {
-	response.send(result.value)
-      } else if (error) {
-	response.status(503).send(error);
-      } else {
-	response.sendStatus(404);
-      } 
+    collection.findOneAndUpdate({}, {$set:{}}, options, function (error, result) {
+      response.sendStatus(503);
       client.close();
     });
   });
@@ -108,26 +65,12 @@ function getPutBodyIsAllowed(requestParams, requestBody) {
 app.delete("/films/:id", function (request, response) {
   const client = new mongodb.MongoClient(uri, mongoOptions);
 
-  if (!mongodb.ObjectId.isValid(request.params.id)) {
-    response.sendStatus(400);
-    return
-  }
-
   client.connect(function () {
     const db = client.db("cinema");
     const collection = db.collection("films");
 
-    const searchObject = { _id: mongodb.ObjectId(request.params.id) };
-
-    collection.deleteOne(searchObject, function (error, result) {
-      if (error) {
-        response.status(500).send(error);
-      } else if (result.deletedCount) {
-        response.sendStatus(204);
-      } else {
-        response.sendStatus(404);
-      }
-
+    collection.deleteOne({}, function (error, result) {
+      response.status(500).send(error);
       client.close();
     });
   });
